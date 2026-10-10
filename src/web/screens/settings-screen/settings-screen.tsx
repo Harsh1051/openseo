@@ -1,0 +1,156 @@
+'use client'
+
+import { memo, useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+	BROKEN_LINK_OPTIONS,
+	CRAWL_PAGE_OPTIONS,
+	type PublicSettings,
+	type Settings
+} from '@shared/settings'
+import { Icon } from '@web/components/icon'
+import { PageHeader } from '@web/components/page-header'
+import { ApiKeyField } from './components/api-key-field'
+import { Row } from './components/row'
+import { Section } from './components/section'
+import { SettingSelect } from './components/setting-select'
+import { SettingToggle } from './components/setting-toggle'
+import { ThemeOption } from './components/theme-option'
+import { THEMES } from './settings-screen.constants'
+import type { SettingsScreenProps } from './settings-screen.types'
+
+/** Appearance and audit options. Every change saves straight away. */
+const SettingsScreen = (props: SettingsScreenProps) => {
+	const { settings: initial, version } = props
+
+	const router = useRouter()
+	const [settings, setSettings] = useState<PublicSettings>(initial)
+	const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+	const update = useCallback(
+		async (patch: Partial<Settings>) => {
+			setStatus('saving')
+			const res = await fetch('/api/settings', {
+				method: 'PUT',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(patch)
+			})
+			if (!res.ok) {
+				setStatus('error')
+
+				return
+			}
+			setSettings(await res.json())
+			setStatus('saved')
+			router.refresh()
+		},
+		[router]
+	)
+
+	return (
+		<div className="screen settings">
+			<PageHeader
+				eyebrow="Workspace"
+				title="Settings"
+				description="Changes save as you make them."
+				actions={
+					status !== 'idle' && (
+						<span className={`save-status is-${status}`} role="status">
+							{status === 'saving' && 'Saving…'}
+							{status === 'saved' && (
+								<>
+									<Icon name="check" size={14} /> Saved
+								</>
+							)}
+							{status === 'error' && "Couldn't save. Try again."}
+						</span>
+					)
+				}
+			/>
+
+			<Section title="Appearance">
+				<Row label="Theme" note="Applies to the app and shared reports.">
+					<div className="segmented" role="radiogroup" aria-label="Theme">
+						{THEMES.map((t) => (
+							<ThemeOption
+								key={t.value}
+								value={t.value}
+								label={t.label}
+								checked={settings.theme === t.value}
+								onSelect={(theme) => update({ theme })}
+							/>
+						))}
+					</div>
+				</Row>
+			</Section>
+
+			<Section title="Audits">
+				<Row
+					label="Core Web Vitals"
+					note="Runs Google PageSpeed Insights for real-browser speed scores and screenshots. Adds about 20 seconds."
+					htmlFor="s-pagespeed"
+				>
+					<SettingToggle
+						id="s-pagespeed"
+						setting="pagespeedEnabled"
+						settings={settings}
+						onChange={update}
+					/>
+				</Row>
+				<Row
+					label="PageSpeed API key"
+					note="Free from Google Cloud. Without one, Google often turns requests away."
+					htmlFor="s-key"
+				>
+					<ApiKeyField
+						id="s-key"
+						hasKey={settings.hasPagespeedKey}
+						fromEnv={settings.pagespeedKeyFromEnv}
+						onChange={update}
+					/>
+				</Row>
+				<Row
+					label="Links to check per audit"
+					note="Each one is a request to the linked site."
+					htmlFor="s-links"
+				>
+					<SettingSelect
+						id="s-links"
+						setting="brokenLinkLimit"
+						options={BROKEN_LINK_OPTIONS}
+						settings={settings}
+						onChange={update}
+					/>
+				</Row>
+				<Row label="Most pages per crawl" htmlFor="s-crawl">
+					<SettingSelect
+						id="s-crawl"
+						setting="crawlPageLimit"
+						options={CRAWL_PAGE_OPTIONS}
+						settings={settings}
+						onChange={update}
+					/>
+				</Row>
+			</Section>
+
+			<Section title="About">
+				<Row
+					label={`OpenSEO ${version}`}
+					note="Free and open source under the MIT license. Reports, crawls and settings are JSON files in the data folder."
+				>
+					<a
+						className="button"
+						href="https://github.com/alexsilver8/openseo"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<Icon name="code" size={15} />
+						Source code
+					</a>
+				</Row>
+			</Section>
+		</div>
+	)
+}
+
+export default memo(SettingsScreen)

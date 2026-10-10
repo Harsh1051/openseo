@@ -1,0 +1,15 @@
+# docker compose up -d, then open http://localhost:3000
+services:
+    openseo:
+        build: .
+        ports:
+            - '3000:3000'
+        environment:
+            ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+            PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
+        volumes:
+            - openseo-data:/data
+        restart: unless-stopped
+
+volumes:
+    openseo-data:
