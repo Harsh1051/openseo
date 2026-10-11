@@ -12,7 +12,9 @@ const PreviewCard = (props: PreviewCardProps) => {
 	const [telegramLayout, setTelegramLayout] = useState<'small' | 'large'>('large')
 
 	const displayPreview =
-		preview.platform === 'telegram' ? { ...preview, layout: telegramLayout } : preview
+	preview.platform === 'telegram' && preview.layout !== 'none'
+		? { ...preview, layout: telegramLayout }
+		: preview
 
 	const headingId = `share-${preview.platform}`
 

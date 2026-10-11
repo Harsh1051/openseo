@@ -140,12 +140,45 @@ const PreviewFrame = (props: PreviewFrameProps) => {
 		case 'telegram':
 			return (
 				<div className={`mock mock-telegram is-${layout}`}>
-					{hasImage && <PreviewImage className="mock-image" src={image} />}
-					<span className="mock-telegram-text">
-						<strong className="mock-clamp-2">{title}</strong>
-						{description && <span className="mock-clamp-2">{description}</span>}
-						<span className="mock-telegram-domain">{domain}</span>
-					</span>
+					<div className="mock-telegram-header">
+						<span className="mock-telegram-heading">
+							<span className="mock-telegram-dot" />
+							<strong>Telegram</strong>
+						</span>
+						<span className="mock-telegram-kind">Chat message</span>
+					</div>
+
+					<div className="mock-telegram-body">
+						<div className="mock-telegram-card">
+							<span className="mock-telegram-domain">{domain}</span>
+
+							<div className="mock-telegram-content">
+								<div className="mock-telegram-copy">
+									{siteName && (
+										<strong className="mock-telegram-site">{siteName}</strong>
+									)}
+									<strong className="mock-clamp-2">{title}</strong>
+									{description && (
+										<span className="mock-clamp-3">{description}</span>
+									)}
+								</div>
+
+								{layout === 'small' && hasImage && (
+									<PreviewImage
+										className="mock-image mock-telegram-thumb"
+										src={image}
+									/>
+								)}
+							</div>
+
+							{layout === 'large' && hasImage && (
+								<PreviewImage
+									className="mock-image mock-telegram-image"
+									src={image}
+								/>
+							)}
+						</div>
+					</div>
 				</div>
 			)
 		case 'imessage':
