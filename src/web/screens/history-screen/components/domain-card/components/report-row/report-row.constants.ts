@@ -5,5 +5,7 @@ export const SOURCE_LABELS: Record<ReportSource, string> = {
 	// Only on reports from before the embed was removed.
 	embed: 'Embed',
 	api: 'API',
-	cli: 'Terminal'
+	cli: 'Terminal',
+	monitor: 'Monitor',
+	mcp: 'MCP'
 }

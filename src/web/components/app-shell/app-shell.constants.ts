@@ -6,12 +6,16 @@ export const NAV: NavGroup[] = [
 		items: [
 			{ href: '/', label: 'New audit', icon: 'audit' },
 			{ href: '/preview', label: 'Share preview', icon: 'image' },
-			{ href: '/history', label: 'History', icon: 'clock' }
+			{ href: '/history', label: 'History', icon: 'clock' },
+			{ href: '/compare', label: 'Compare', icon: 'compare' }
 		]
 	},
 	{
 		title: 'Site',
-		items: [{ href: '/crawls', label: 'Crawler', icon: 'crawl' }]
+		items: [
+			{ href: '/crawls', label: 'Crawler', icon: 'crawl' },
+			{ href: '/monitors', label: 'Monitors', icon: 'bell' }
+		]
 	},
 	{
 		title: 'Workspace',
